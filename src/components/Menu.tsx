@@ -4,6 +4,23 @@ import Link from "next/link";
 
 const menuItems = [
   {
+    title: "GRC",
+    items: [
+      {
+        icon: "/grc/cit.png",
+        label: "合规条文",
+        href: "/list/cits",
+        visible: ["admin", "teacher", "student", "parent"],
+      },
+      {
+        icon: "/grc/cob.png",
+        label: "控制目标",
+        href: "/list/cobs",
+        visible: ["admin", "teacher", "student", "parent"],
+      },
+    ],
+  },
+  {
     title: "MENU",
     items: [
       {

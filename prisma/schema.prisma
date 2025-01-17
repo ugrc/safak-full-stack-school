@@ -191,3 +191,18 @@ enum Day {
   THURSDAY
   FRIDAY
 }
+
+model Cit {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  active    Boolean
+  cobs        Cob[]
+}
+
+model Cob {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  cits        Cit[]
+}

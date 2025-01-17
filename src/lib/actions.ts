@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  CitSchema,
   ClassSchema,
   ExamSchema,
   StudentSchema,
@@ -12,6 +13,73 @@ import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
 
 type CurrentState = { success: boolean; error: boolean };
+
+export const createCit = async (
+  currentState: CurrentState,
+  data: CitSchema
+) => {
+  try {
+    await prisma.cit.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        active: true,
+        cobs: {
+          connect: data.cobs.map((cobId) => ({ id: parseInt(cobId) })),
+        },
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateCit = async (
+  currentState: CurrentState,
+  data: CitSchema
+) => {
+  console.log(data);
+  try {
+    await prisma.cit.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        cobs: {
+          set: data.cobs.map((cobId) => ({ id: parseInt(cobId) })),
+        },
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteCit = async (currentState: CurrentState, data: FormData) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.cit.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
 
 export const createSubject = async (
   currentState: CurrentState,
@@ -147,7 +215,7 @@ export const createTeacher = async (
       password: data.password,
       firstName: data.name,
       lastName: data.surname,
-      publicMetadata:{role:"teacher"}
+      publicMetadata: { role: "teacher" },
     });
 
     await prisma.teacher.create({
@@ -267,7 +335,7 @@ export const createStudent = async (
       password: data.password,
       firstName: data.name,
       lastName: data.surname,
-      publicMetadata:{role:"student"}
+      publicMetadata: { role: "student" },
     });
 
     await prisma.student.create({

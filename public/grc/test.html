@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, 
+                   initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <title>
+        Using Flexbox to fill full height
+    </title>
+</head>
+
+<body>
+    <div align="center">
+        <div class="w-full bg-green-300">
+            <h1 class="text-green-600 
+                   text-5xl 
+                   mb-4 font-bold">
+                GeeksforGeeks
+
+            </h1>
+            <b>Using Flexbox to fill full height</b>
+        </div>
+
+        <div class="flex flex-row justify-between">
+            <div>sidebar</div>
+            <div>main</div>
+        </div>
+
+        <!-- <div class="parent flex flex-col 
+                    h-64 bg-gray-300
+                    mt-4 w-1/2">
+            <div class="child flex-1 h-full 
+                        mx-auto bg-blue-500 w-3/4">
+            </div>
+        </div> -->
+    </div>
+</body>
+
+</html>

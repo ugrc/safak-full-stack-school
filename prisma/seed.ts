@@ -201,6 +201,27 @@ async function main() {
     });
   }
 
+  // Citations
+  for (let i = 1; i <=100; i++ ){
+    await prisma.cit.create({
+      data: {
+        name: `合规条文-${i}`,
+        description: `合规内容 ${i}`,
+        active: true,
+      }
+    })
+  }
+  // Control Objective
+  for (let i = 1; i <=100; i++ ){
+    await prisma.cob.create({
+      data: {
+        name: `控制目标-${i}`,
+        description: `控制目标描述 ${i}`,
+        cits: { connect: [{ id: (i % 10) + 1 }] }, 
+      }
+    })
+  }
+  
   console.log("Seeding completed successfully.");
 }
 

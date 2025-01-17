@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  deleteCit,
   deleteClass,
   deleteExam,
   deleteStudent,
@@ -14,8 +15,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { FormContainerProps } from "./FormContainer";
+import { citSchema } from "@/lib/formValidationSchemas";
 
 const deleteActionMap = {
+  cit: deleteCit,
   subject: deleteSubject,
   class: deleteClass,
   teacher: deleteTeacher,
@@ -35,6 +38,11 @@ const deleteActionMap = {
 
 // import TeacherForm from "./forms/TeacherForm";
 // import StudentForm from "./forms/StudentForm";
+
+
+const CitForm = dynamic(() => import("./forms/CitForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
   loading: () => <h1>Loading...</h1>,
@@ -61,6 +69,15 @@ const forms: {
     relatedData?: any
   ) => JSX.Element;
 } = {
+  cit: (setOpen, type, data, relatedData) => (
+    <CitForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+
   subject: (setOpen, type, data, relatedData) => (
     <SubjectForm
       type={type}
@@ -141,7 +158,7 @@ const FormModal = ({
       <form action={formAction} className="p-4 flex flex-col gap-4">
         <input type="text | number" name="id" value={id} hidden />
         <span className="text-center font-medium">
-          All data will be lost. Are you sure you want to delete this {table}?
+          确认是否删除该条数据?
         </span>
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center">
           Delete

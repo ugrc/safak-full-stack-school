@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const citSchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z.string().min(1, { message: "请输入合规条文名称!" }),
+  description: z.string().min(1, { message: "请输入合规条文名称!" }),
+  cobs: z.array(z.string()), //cobs ids
+});
+
+export type CitSchema = z.infer<typeof citSchema>;
+
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "Subject name is required!" }),

@@ -2,6 +2,7 @@
 
 import {
   deleteCit,
+  deleteCob,
   deleteClass,
   deleteExam,
   deleteStudent,
@@ -19,6 +20,7 @@ import { citSchema } from "@/lib/formValidationSchemas";
 
 const deleteActionMap = {
   cit: deleteCit,
+  cob: deleteCob,
   subject: deleteSubject,
   class: deleteClass,
   teacher: deleteTeacher,
@@ -41,6 +43,10 @@ const deleteActionMap = {
 
 
 const CitForm = dynamic(() => import("./forms/CitForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+const CobForm = dynamic(() => import("./forms/CobForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -71,6 +77,15 @@ const forms: {
 } = {
   cit: (setOpen, type, data, relatedData) => (
     <CitForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+
+  cob: (setOpen, type, data, relatedData) => (
+    <CobForm
       type={type}
       data={data}
       setOpen={setOpen}

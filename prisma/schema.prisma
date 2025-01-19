@@ -193,10 +193,10 @@ enum Day {
 }
 
 model Cit {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String
-  active    Boolean
+  active      Boolean
   cobs        Cob[]
 }
 
@@ -205,4 +205,133 @@ model Cob {
   name        String
   description String
   cits        Cit[]
+}
+
+// Entity Framework
+// https://www.servicenow.com/community/grc-articles/how-to-implement-the-entity-framework/ta-p/2385192
+
+// Tier 1: Business, Tier 2: Application, Tier 3: IT Asset.
+model EntityTier {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String?
+  label       String
+  level       Int
+  EntityClass EntityClass[]
+}
+
+model EntityClass {
+  id               Int      @id // @default(autoincrement())
+  name             String
+  description      String?
+  isRoot           Boolean?
+  functionalDomain String? // 描述该实体类所属的业务域，必须人力资源、销售、财务等
+  complianceScore  Int? // 合规得分，计算所得
+
+  // 每个class可以有一个或多个predecessor, 但该parent的能汇聚到root.
+  predecessors EntityClass[] @relation("EntityClassRollUpTo")
+  successors   EntityClass[] @relation("EntityClassRollUpTo")
+
+  tierId   Int?
+  tier     EntityTier? @relation(fields: [tierId], references: [id])
+  entities Entity[]    @relation("EntityClass")
+}
+
+model EntityType {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  isActive         Boolean? @default(true)
+  functionalDomain String? // 描述该实体类所属的业务域，必须人力资源、销售、财务等
+  complianceScore  Int? // 合规得分，计算所得
+
+  entities Entity[]
+}
+
+model Department {
+  id             Int    @id @default(autoincrement())
+  name           String
+  description    String?
+  departmentHead String?
+  primaryContact String?
+
+  parentID Int?
+  parent   Department?  @relation("ParentChildren", fields: [parentID], references: [id])
+  children Department[] @relation("ParentChildren")
+
+  User   User[]
+  Entity Entity[]
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  userId        String
+  password      String
+  email         String?
+  firstName     String?
+  lastName      String?
+  Title         String?
+  calendar      String?
+  timeZone      String?
+  businessPhone String?
+  mobilePhone   String?
+
+  isActive           Boolean? @default(true)
+  lockedOut          Boolean? @default(false)
+  passwordNeedsReset Boolean? @default(false)
+
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  Location     Location[]
+
+  entities Entity[] @relation("EntityOwner")
+}
+
+model Location {
+  id         Int     @id @default(autoincrement())
+  name       String?
+  street     String?
+  city       String?
+  province   String?
+  postalCode String?
+  Country    String?
+  fullName   String?
+  phone      String?
+  faxPhone   String?
+  Parent     String?
+  Latitude   Float?
+  Longitude  Float?
+
+  contactId Int?
+  contact   User? @relation(fields: [contactId], references: [id])
+
+  parentID Int?
+  parent   Location?  @relation("ParentChildren", fields: [parentID], references: [id])
+  children Location[] @relation("ParentChildren")
+  Entity   Entity[]
+}
+
+model Entity {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  isActive         Boolean?
+  functionalDomain String? // 描述该实体类所属的业务域，必须人力资源、销售、财务等
+
+  attestationFreqency String? //Weekly Annually Monthly Quarterly Semi-annually Daily
+  complianceScore     Int?
+
+  ownerId Int?
+  owner   User? @relation("EntityOwner", fields: [ownerId], references: [id])
+
+  entityClassId Int?
+  entityClass   EntityClass? @relation("EntityClass", fields: [entityClassId], references: [id])
+
+  locationId Int?
+  location   Location? @relation(fields: [locationId], references: [id])
+
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  entityTypes EntityType[]
 }

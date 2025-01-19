@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   CitSchema,
   ClassSchema,
+  CobSchema,
   ExamSchema,
   StudentSchema,
   SubjectSchema,
@@ -13,6 +14,73 @@ import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
 
 type CurrentState = { success: boolean; error: boolean };
+export const createCob = async (
+  currentState: CurrentState,
+  data: CobSchema
+) => {
+  try {
+    await prisma.cob.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        cits: {
+          connect: data.cits.map((citId) => ({ id: parseInt(citId) })),
+        },
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateCob = async (
+  currentState: CurrentState,
+  data: CobSchema
+) => {
+  console.log(data);
+  try {
+    await prisma.cob.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
+        cits: {
+          set: data.cits.map((citId) => ({ id: parseInt(citId) })),
+        },
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteCob = async (currentState: CurrentState, data: FormData) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.cob.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
 
 export const createCit = async (
   currentState: CurrentState,

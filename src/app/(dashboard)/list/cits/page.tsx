@@ -8,6 +8,7 @@ import { auth } from "@clerk/nextjs/server";
 import { Cit, Cob, Prisma } from "@prisma/client";
 import Image from "next/image";
 
+
 type CitList = Cit & { cobs: Cob[] };
 
 const CitListPage = async ({
@@ -34,7 +35,7 @@ const CitListPage = async ({
       //   该列缺省将不显示，但当屏幕大小是md时，将显示table-cell.
       className: "hidden md:table-cell",
     },
-    
+
     {
       header: "控制目标",
       accessor: "cobs",
@@ -53,8 +54,8 @@ const CitListPage = async ({
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{item.name}</td>
-      <td className="">{item.active? "是": "否"}</td>
-      
+      <td className="">{item.active ? "是" : "否"}</td>
+
       <td className="hidden md:table-cell">{item.description}</td>
       <td className="hidden md:table-cell">
         {item.cobs.map((cob) => cob.name).join(",")}
@@ -101,6 +102,7 @@ const CitListPage = async ({
     prisma.cit.count({ where: query }),
   ]);
 
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* Top */}
@@ -116,6 +118,14 @@ const CitListPage = async ({
               <Image src={"/sort.png"} alt={""} width={14} height={14} />
             </button>
             {role === "admin" && (
+              // <button
+              //   className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow"
+              //   onClick={() => {
+              //     console.log("hello");
+              //   }}
+              // >
+              //   <Image src={"/create.png"} alt={""} width={14} height={14} />
+              // </button>
               <FormContainer table="cit" type="create" />
             )}
           </div>

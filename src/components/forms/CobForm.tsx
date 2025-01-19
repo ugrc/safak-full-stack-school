@@ -3,13 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { citSchema, CitSchema } from "@/lib/formValidationSchemas";
-import { createCit, updateCit } from "@/lib/actions";
+import { cobSchema, CobSchema } from "@/lib/formValidationSchemas";
+import { createCob, updateCob } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { Cob } from "@prisma/client";
 
 const CitForm = ({
   type,
@@ -26,14 +25,14 @@ const CitForm = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CitSchema>({
-    resolver: zodResolver(citSchema),
+  } = useForm<CobSchema>({
+    resolver: zodResolver(cobSchema),
   });
 
   // AFTER REACT 19 IT'LL BE USEACTIONSTATE
 
   const [state, formAction] = useFormState(
-    type === "create" ? createCit : updateCit,
+    type === "create" ? createCob : updateCob,
     {
       success: false,
       error: false,
@@ -54,12 +53,12 @@ const CitForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  const { cobs } = relatedData;
+  const { cits } = relatedData;
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "新建合规条文" : "修改合规条文1"}
+        {type === "create" ? "新建控制目标" : "修改控制目标"}
       </h1>
 
       <div className="h-[75vh]  overflow-scroll flex flex-col bg-gray-100 rounded-md p-4">
@@ -75,14 +74,14 @@ const CitForm = ({
             />
           )}
           <InputField
-            label="合规条文名称"
+            label="控制目标名称"
             name="name"
             defaultValue={data?.name}
             register={register}
             error={errors?.name}
           />
           <InputField
-            label="合规条文内容"
+            label="控制目标内容"
             name="description"
             defaultValue={data?.description}
             register={register}
@@ -90,30 +89,29 @@ const CitForm = ({
           />
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-xs text-gray-500">关联控制目标1</label>
+            <label className="text-xs text-gray-500">关联合规条文</label>
             <select
               multiple
               className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-              {...register("cobs")}
-              defaultValue={data?.cobs.map((cob: { id: any }) => cob.id)}
+              {...register("cits")}
+              defaultValue={data?.cits}
             >
-              {cobs.map(
-                (cob: { id: string; name: string; description: string }) => (
-                  <option value={cob.id} key={cob.id}>
-                    {cob.name + " " + cob.description}
+              {cits.map(
+                (cit: { id: string; name: string; description: string }) => (
+                  <option value={cit.id} key={cit.id}>
+                    {cit.name + " " + cit.description}
                   </option>
                 )
               )}
             </select>
-            {errors.cobs?.message && (
+            {errors.cits?.message && (
               <p className="text-xs text-red-400">
-                {errors.cobs.message.toString()}
+                {errors.cits.message.toString()}
               </p>
             )}
           </div>
         </div>
       </div>
-
       {state.error && (
         <span className="text-red-500">Something went wrong!</span>
       )}

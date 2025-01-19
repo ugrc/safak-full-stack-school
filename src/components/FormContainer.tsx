@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 export type FormContainerProps = {
   table:
     | "cit"
+    | "cob"
     | "teacher"
     | "student"
     | "parent"
@@ -23,6 +24,9 @@ export type FormContainerProps = {
 };
 
 const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
+
+  console.log(data);
+  
   let relatedData = {};
 
   const { userId, sessionClaims } = auth();
@@ -37,6 +41,13 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         });
         relatedData = { cobs: citCobs };
         break;
+
+        case "cob":
+          const cobCits = await prisma.cit.findMany({
+            select: { id: true, name: true, description: true },
+          });
+          relatedData = { cits: cobCits };
+          break;
       case "subject":
         const subjectTeachers = await prisma.teacher.findMany({
           select: { id: true, name: true, surname: true },

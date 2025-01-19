@@ -9,6 +9,15 @@ export const citSchema = z.object({
 
 export type CitSchema = z.infer<typeof citSchema>;
 
+export const cobSchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z.string().min(1, { message: "请输入控制目标名称!" }),
+  description: z.string().min(1, { message: "请输入控制目标名称!" }),
+  cits: z.array(z.string()), //cits ids
+});
+
+export type CobSchema = z.infer<typeof cobSchema>;
+
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "Subject name is required!" }),

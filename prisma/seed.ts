@@ -6,6 +6,7 @@ import {
   entityTypeData,
   locationData,
   userData,
+  adfData,
 } from "../src/lib/grcData";
 import { Day, PrismaClient, UserSex } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -276,8 +277,8 @@ async function main() {
       create: {
         id: Number(entityClass.id),
         name: entityClass.name,
-        tierId: entityClass.tierId? null :  parseInt(entityClass.tierId),
-   
+        tierId: entityClass.tierId ? null : parseInt(entityClass.tierId),
+
         predecessors: {
           connect: predecessorIds,
         },
@@ -319,13 +320,53 @@ async function main() {
     console.log(result);
   }
 
+  // Adf data
+
+  for (var adf of adfData) {
+    const predecessorIds = adf.predecessors
+      ? adf.predecessors.split(",").map((id) => ({ id: parseInt(id) }))
+      : undefined;
+
+    const upstreamIds = adf.upstreams
+      ? adf.upstreams.split(",").map((id) => ({ id: parseInt(id) }))
+      : undefined;
+
+    const result = await prisma.adf.upsert({
+      where: { id: Number(adf.id) },
+      update: {},
+      create: {
+        id: Number(adf.id),
+        name: adf.name,
+        regulationType: adf.regulationType,
+        annNo: adf.annNo,
+        annAgency: adf.annAgency,
+        annBody: adf.annBody,
+        state: adf.state,
+        body: adf.body,
+        orginalUrl: adf.orginalUrl,
+        documentedOn: adf.documentedOn ? (new Date(adf.documentedOn)).toISOString() : null,
+        publishedOn: adf.publishedOn ? (new Date(adf.publishedOn)).toISOString() : null,
+        effectiveOn: adf.effectiveOn ? (new Date(adf.effectiveOn)).toISOString() : null,
+        expiredOn: adf.expiredOn ? (new Date(adf.expiredOn)).toISOString() : null,
+        functionalDomains: adf.functionalDomains,
+        predecessors: {
+          connect: predecessorIds,
+        },
+        upstreams: {
+          connect: upstreamIds,
+        },
+      },
+    });
+    console.log(result);
+  }
+
   // Citations
   for (let i = 1; i <= 100; i++) {
     await prisma.cit.create({
       data: {
         name: `合规条文-${i}`,
         description: `合规内容 ${i}`,
-        active: true,
+        isActive: true,
       },
     });
   }

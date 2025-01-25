@@ -1,5 +1,28 @@
 import { z } from "zod";
 
+export const adfSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  commonName: z.string().optional(),
+  description: z.string().optional(),
+  regulationType: z.string().optional(),
+  annNo: z.string().optional(),
+  annAgency: z.string().optional(),
+  annBody: z.string().optional(),
+  state: z.string().optional(),
+  body: z.string().optional(),
+  orginalUrl: z.string().optional(),
+  documentedOn: z.coerce.date().optional(),
+  publishedOn: z.coerce.date().optional(),
+  effectiveOn: z.coerce.date().optional(),
+  expiredOn: z.coerce.date().optional(),
+  functionalDomains: z.string().optional(),
+  predecessors: z.array(z.number()).optional(),
+  successors: z.array(z.number()).optional(),
+  upstreams: z.array(z.number()).optional(),
+  downstreams: z.array(z.number()).optional(),
+});
+
 export const citSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "请输入合规条文名称!" }),

@@ -192,19 +192,215 @@ enum Day {
   FRIDAY
 }
 
+model FuntionalDomain {
+  name        String   @unique @db.VarChar(200) // 对信息进行分类
+  description String?  @db.VarChar(500) // 简要描述 
+  value       String   @db.VarChar(200) // 存储在被关联的表中
+  class       String?  @db.VarChar(200)
+  isActive    Boolean? // 是否有效
+}
+
+// https://www.gov.cn/zhengce/content/202409/content_6977766.htm
+model Adf {
+  id                Int       @id @default(autoincrement())
+  name              String    @db.VarChar(200) // 合规文件名称, 网络数据安全管理条例
+  commonName        String?   @db.VarChar(100) // 简称
+  description       String?   @db.VarChar(500) // 简要描述
+  regulationType    String? // 合规文件类型，包括 1、法律；2、行政法规；3、地方性法规；4、自治条例和单行条例；5、国务院部门规章；6、地方政府规章
+  annNo             String?   @db.VarChar(40) // 发文文号, 国令第790号
+  annAgency         String?   @db.VarChar(100) // 发文机构 国务院
+  annBody           String?   @db.VarChar(1000) // 发文公告 
+  // 
+  //  中华人民共和国国务院令
+  //  第790号
+  //  《网络数据安全管理条例》已经2024年8月30日国务院第40次常务会议通过，现予公布，自2025年1月1日起施行。
+  //  总理  李强
+  //  2024年9月24日
+  //  
+  state             String?   @db.VarChar(20) // 合规文件状态：已立项、起草中、已发布、施行中、已废止，参考《规章制定程序条例》
+  body              String?   @db.Text // 合规文件原文
+  orginalUrl        String?   @db.Text // 合规文件原文地址, https://www.gov.cn/zhengce/content/202409/content_6977766.htm
+  documentedOn      DateTime? //成文日期 	2024-09-24
+  publishedOn       DateTime? // 发布日期 	2024-09-30
+  effectiveOn       DateTime? // 施行日期   2025-01-01
+  expiredOn         DateTime? // 废止日期
+  functionalDomains String // 对应主题，可以是多选的tag，中间用|隔开。
+
+  // 描述法规文件的替代关系，一个法规文件之间的替代关系可以是m-n
+  predecessors Adf[] @relation("AdfSupersedement")
+  successors   Adf[] @relation("AdfSupersedement")
+
+  // 描述法规文件之间的优先关系。upstreams表示制定该法规时所依据的文件
+  // downstream
+  upstreams   Adf[] @relation("AdfDependency")
+  downstreams Adf[] @relation("AdfDependency")
+
+  cits Cit[]
+}
+
+// https://www.servicenow.com/docs/bundle/xanadu-governance-risk-compliance/page/product/grc-policy-and-compliance/task/t_DefineAPolicy.html
+
+model Pol {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(200) // 合规文件名称, 网络数据安全管理条例
+  description String? @db.VarChar(500) // 简要描述
+
+  type            String? // Policy Procedure Standard Plan Checklist Framework Template
+  state           String? // 起草中, 审批中, 参考内部制度管理办法
+  complianceScore Int?
+
+  // Pol之间父子关系
+  parentId Int?
+  parent   Pol?  @relation(name: "PolParentChildren", fields: [parentId], references: [id])
+  children Pol[] @relation(name: "PolParentChildren")
+
+  cobs Cob[] // Pol和Cob之间是m-n关系
+}
+
 model Cit {
   id          Int     @id @default(autoincrement())
-  name        String
-  description String
-  active      Boolean
-  cobs        Cob[]
+  name        String  @db.VarChar(200) // the information in outline
+  description String? @db.VarChar(1000) // 简要描述
+
+  reference   String? @db.VarChar(100) // the ref no in other informaiton.
+  paraType    String? @db.VarChar(20) // 篇、分篇、章、节、条、款、项、目
+  contentType String? @db.VarChar(20) // 合规要求、术语定义、补充信息、目录信息
+  paraOrder   Int? // 该记录在本级的顺序号
+
+  articleNo       Int? // 该条文（第多少条）在合规文件的顺序号
+  isActive        Boolean? // 当前条文是否是现行有效
+  complianceScore Int      @default(0)
+
+  createdAt DateTime  @default(now()) //系统中创建的缺省时间
+  updatedAt DateTime? @updatedAt // 更新日期
+
+  // one-to-many relation between adf and cit
+  adfId Int?
+  adf   Adf? @relation(fields: [adfId], references: [id])
+
+  // one-to-many  ParentChildren self-relation.
+  parentId Int?
+  parent   Cit?  @relation(name: "CitParentChildren", fields: [parentId], references: [id])
+  children Cit[] @relation(name: "CitParentChildren")
+
+  // many-to-many relation between cob and cit.
+  cobs Cob[]
 }
 
 model Cob {
-  id          Int    @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  isActive        Boolean? @default(false)
+  reference       String?
+  complianceScore Int?
+  category        String?
+  classfication   String?
+
+  // Pol之间父子关系
+  parentId Int?
+  parent   Cob?  @relation(name: "CobParentChildren", fields: [parentId], references: [id])
+  children Cob[] @relation(name: "CobParentChildren")
+
+  cits Cit[]
+  pols Pol[]
+  ctls Ctl[]
+}
+
+model Ctl {
+  id          Int      @id @default(autoincrement())
   name        String
-  description String
-  cits        Cit[]
+  description String?
+  weight      Int?     @default(10) // 控制措施的权重，缺省时10. 
+  state       String? // draft, attested, review, monitor, retired.
+  status      String? // the status of compliance result. 合规结果： 合规, 不合规, 基于合规/不合规，以及是否豁免，权重，计算控制目标、以及entity的合规得分。
+  function    String? // Standard control or common control
+  isExempted  Boolean? // 是否豁免
+
+  cobId Int
+  cob   Cob? @relation(fields: [cobId], references: [id])
+
+  entityId Int
+  entity   Entity? @relation(fields: [entityId], references: [id])
+  att      Att[]
+
+  ownerID Int?
+  owner   User? @relation(fields: [ownerID], references: [id])
+}
+
+model Att {
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String?
+  state           String? // ready to take
+  dueDate         DateTime? // 证明到期日期
+  expiredDate     DateTime? // 证明失效日期
+  result          String? // 已实施, 未实施, 不适用
+  evidenceName    String? // evidence的文件名
+  evidenceSize    Int? // Byets of the evidence file
+  evidenceType    String? // content type of evidence.  
+  evidenceComment String? // comment of the evidence.
+
+  ctlId Int
+  ctl   Ctl @relation(fields: [ctlId], references: [id])
+
+  entityId Int
+  entity   Entity @relation(fields: [entityId], references: [id])
+
+  ownerID Int?
+  owner   User? @relation(fields: [ownerID], references: [id])
+}
+
+model Indicator {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  Category     String? // Control indicator or Risk indicator
+  type         String? // Manual, Basic, Script
+  targetType   String? // None, count, percentage
+  resultRule   String? // 如果值达到或超过目标值, 失效,通过
+  frequency    String? // Daily, Weekly, Monthly, Quarterly, Semi-annually, Annually
+  nextRunDate  DateTime? // 下次执行时间
+  dueDuration  Int? // 离下次执行时间的间隔天数
+  firstRunDate DateTime? // 本次执行时间
+  status       String? // 有效，无效
+  prevStatus   String? // 有效，无效
+
+  indicatorResults IndicatorResult[]
+}
+
+// To execute a ServiceNow indicator on the same day, you need to set the "Refresh Interval" for the indicator to a time period that falls within the same day, such as "Hourly" or "Every 30 Minutes" depending on how frequently you want the indicator to update.
+
+model IndicatorResult {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  isPassed Boolean
+
+  indicatorId Int
+  indicator   Indicator @relation(fields: [indicatorId], references: [id])
+}
+
+model IndicatorTask {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  state       String? //Open, work in progress, closed, cancelled
+  result      String? //失效, 有效
+}
+
+model Issue {
+  id          Int     @id @default(autoincrement())
+  name        String // 输入名称时，可在建议名称列表中选择，然后基于问题名称，搜索知识库
+  description String?
+  state       String? @default("New") //
+  priority    String?
+  resource    String? // 问题来源，包括控制证明失效等
+  type        String?
+
+  ownerID Int?
+  owner   User? @relation(fields: [ownerID], references: [id])
 }
 
 // Entity Framework
@@ -249,7 +445,7 @@ model EntityType {
 }
 
 model Department {
-  id             Int    @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   name           String
   description    String?
   departmentHead String?
@@ -285,6 +481,9 @@ model User {
   Location     Location[]
 
   entities Entity[] @relation("EntityOwner")
+  ctls     Ctl[]
+  Att      Att[]
+  Issue    Issue[]
 }
 
 model Location {
@@ -334,4 +533,6 @@ model Entity {
   department   Department? @relation(fields: [departmentId], references: [id])
 
   entityTypes EntityType[]
+  ctls        Ctl[]
+  atts        Att[]
 }

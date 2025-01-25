@@ -4,23 +4,53 @@ import Link from "next/link";
 
 const menuItems = [
   {
-    title: "GRC",
+    title: "合规管理",
     items: [
+      {
+        icon: "/home.png",
+        label: "主页",
+        href: "/admin",
+        visible: ["admin", "risk-manager", "risk-owner", "auditor"],
+      },
+      {
+        icon: "/grc/adf.png",
+        label: "合规文件",
+        href: "/list/adfs",
+        visible: ["admin"],
+      },
       {
         icon: "/grc/cit.png",
         label: "合规条文",
         href: "/list/cits",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin"],
+      },
+      {
+        icon: "/grc/ent.png",
+        label: "受控实体",
+        href: "/list/ents",
+        visible: ["admin"],
       },
       {
         icon: "/grc/cob.png",
         label: "控制目标",
         href: "/list/cobs",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin"],
+      },
+      {
+        icon: "/grc/ctl.png",
+        label: "控制措施",
+        href: "/list/ctls",
+        visible: ["admin"],
+      },
+      {
+        icon: "/grc/issue.png",
+        label: "问题",
+        href: "/list/issues",
+        visible: ["admin"],
       },
     ],
   },
-  {
+/*   {
     title: "MENU",
     items: [
       {
@@ -108,7 +138,7 @@ const menuItems = [
         visible: ["admin", "teacher", "student", "parent"],
       },
     ],
-  },
+  }, */
   {
     title: "OTHER",
     items: [
@@ -137,6 +167,9 @@ const menuItems = [
 const Menu = async () => {
   const user = await currentUser();
   const role = user?.publicMetadata.role as string;
+
+  console.log(role);
+  
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (

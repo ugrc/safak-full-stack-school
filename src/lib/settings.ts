@@ -21,4 +21,5 @@ export const routeAccessMap: RouteAccessMap = {
   "/list/events": ["admin", "teacher", "student", "parent"],
   "/list/announcements": ["admin", "teacher", "student", "parent"],
   "/list/test": ["admin", "teacher", "student", "parent"],
+  "/list/form-zod": ["admin", "teacher", "student", "parent"],
 };

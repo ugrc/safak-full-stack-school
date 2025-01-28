@@ -1,34 +1,42 @@
 "use client";
 
-import * as React from "react";
+// https://www.youtube.com/watch?v=RxMFztEB6a4
+// https://react-hook-form.com/get-started#TypeScript
 
-interface FormElements extends HTMLFormControlsCollection {
-  firstName: HTMLInputElement;
-  lastName: HTMLInputElement;
-}
-interface UsernameFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
+import { useForm } from "react-hook-form";
 
-function Page() {
-  function handleSubmit(event: React.FormEvent<UsernameFormElement>) {
-    event.preventDefault();
-    console.log(event.currentTarget.elements.firstName.value);
-    console.log(event.currentTarget.elements.lastName.value);
-  }
+type FormData = {
+  firstName: string;
+  lastName: string;
+};
 
+const Page = () => {
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+
+  const onSubmit = handleSubmit((data) => console.log(data));
   return (
-    <form className="flex flex-col " onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="firstName">First Name:</label>
-        <input id="firstName" type="text" />
-      </div>
-      <div>
-        <label htmlFor="lastName">Last Name:</label>
-        <input id="lastName" type="text" />
-      </div>
-      <button type="submit">Submit</button>
+    <form onSubmit={onSubmit}>
+      <label>First Name</label>
+      <input {...register("firstName")} />
+      <label>Last Name</label>
+      <input {...register("lastName")} />
+      <button
+        type="button"
+        onClick={() => {
+          setValue("lastName", "Luo");
+        }}
+      >
+        SetValue
+      </button>
+      <button type="submit">Submit</button> 
+
     </form>
   );
-}
+};
+
 export default Page;

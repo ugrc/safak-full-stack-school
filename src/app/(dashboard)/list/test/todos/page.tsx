@@ -4,7 +4,7 @@ import Todo from "@/lib/model/todo";
 import { useRef, useState } from "react";
 import { text } from "stream/consumers";
 import Grid from "@mui/material/Grid2";
-import { Button, Input, TextField } from "@mui/material";
+import { Box, Button, Input, TextField } from "@mui/material";
 
 const initoalTodos = [
   { id: "1", text: "Learn React" },
@@ -20,11 +20,36 @@ const Page = () => {
     setTodos((prevTodos) => prevTodos.concat(newTodo));
   };
 
+  const removeTodoHandle = (todoText: string) => {
+    const newTodo = { id: todoText, text: todoText };
+    // setTodos((prev) => [...prev, { id: todoText, text: todoText }]);
+    setTodos((prevTodos) => prevTodos.filter((item) => item.text !== todoText));
+  };
+
   return (
-    <>
-      <NewTodo onAddTodo={addTodoHandle} />
-      <Todos items={todos} />
-    </>
+    <Grid
+      container
+      direction={"row"}
+      sx={{
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Box
+        justifyContent="center"
+        sx={{
+          width: "50%",
+          bgcolor: "lightgray",
+          borderRadius: 1,
+          padding: 2,
+        }}
+      >
+        <Grid container flexDirection={"column"} spacing={5}>
+          <NewTodo onAddTodo={addTodoHandle} />
+          <Todos items={todos} onRemoveTodo={removeTodoHandle} />
+        </Grid>
+      </Box>
+    </Grid>
   );
 };
 
@@ -42,16 +67,16 @@ const NewTodo = ({ onAddTodo }: { onAddTodo: (text: string) => void }) => {
   };
   return (
     <form onSubmit={submitHandler}>
-      <Grid container flexDirection={"column"}>
-        <TextField variant="filled"
+      <Grid container flexDirection={"column"} spacing={3}>
+        <TextField
+          variant="filled"
           placeholder="Todo Text"
           name="text"
           inputRef={todoTextInputRef}
         />
         {/* <input type="text" id="text" ref={todoTextInputRef}/> */}
         <Button type="submit" variant="contained">
-          {" "}
-          Add Todo1
+          Add Todo
         </Button>
         {/* <button>submit</button> */}
       </Grid>

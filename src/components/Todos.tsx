@@ -1,17 +1,38 @@
 "use client";
 import Todo from "@/lib/model/todo";
 import { Button } from "@mui/material";
+import classes from "@/components/TodoItem.module.css";
 
-const TodoItem = ({ text }: { text: string }) => {
-  return <li>{text}</li>;
+const TodoItem = ({
+  text,
+  onRemoveTodo,
+}: {
+  text: string;
+  onRemoveTodo: () => void;
+}) => {
+  return (
+    <li className={classes.item} onClick={onRemoveTodo}>
+      {text}
+    </li>
+  );
 };
 
-const Todos = ({ items }: { items: Todo[] }) => {
+const Todos = ({
+  items,
+  onRemoveTodo,
+}: {
+  items: Todo[];
+  onRemoveTodo: (todoText: string) => void;
+}) => {
   return (
     <>
       <ul>
         {items.map((item) => (
-          <TodoItem key={item.id} text={item.text} />
+          <TodoItem
+            key={item.id}
+            text={item.text}
+            onRemoveTodo={onRemoveTodo.bind(null, item.text)}
+          />
         ))}
       </ul>
     </>

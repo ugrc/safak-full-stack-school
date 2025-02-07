@@ -24,6 +24,7 @@ const Todos = ({
   items: Todo[];
   onRemoveTodo: (todoText: string) => void;
 }) => {
+  const callbackFn = onRemoveTodo.bind(null, "hello");
   return (
     <>
       <ul>

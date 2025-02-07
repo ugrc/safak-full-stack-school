@@ -155,3 +155,34 @@ let emailData = {
   console.log(don.nextCheck); // logs 75500
   computeSalaryPlusBonus(peggy);
   console.log(peggy.nextCheck); // logs 10600
+
+
+  const func1 = function(arg1: string) {
+    console.log(arg1);
+  }
+
+
+  //given function, bound function
+  const func2 = func1.bind(null, "hello")
+
+  const func3 = () => func1.call(null, "michael");
+
+  func1("world");
+  func2();
+  func3();
+
+  const value = {
+    name: "first value",
+  }
+  const newValue = {
+    name: "new value",
+  }
+
+  type Value = typeof value;
+
+  function log(this: Value, ...args: number[]) {
+    console.log(this.name, ...args);
+  }
+  const boundLog = log.bind(value, 1, 2);
+  const boundLog2 = boundLog.bind(null, 3, 4);
+  boundLog2(); // "this value", 1, 2, 3, 4, 5, 6
